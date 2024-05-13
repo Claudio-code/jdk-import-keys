@@ -1,0 +1,4 @@
+data/org.soneca.jdk.import.ssl.keys.desktop.in
+data/org.soneca.jdk.import.ssl.keys.metainfo.xml.in
+data/org.soneca.jdk.import.ssl.keys.gschema.xml
+src/window.ui

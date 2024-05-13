@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/soneca/jdk/import/ssl/keys/icons/16x16/actions/">
+    <file preprocess="xml-stripblanks" alias="keys-java-sdk-symbolic.svg">resources/icons-dev/keys-java-sdk-symbolic.svg</file>
+  </gresource>
+</gresources>
