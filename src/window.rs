@@ -19,20 +19,24 @@
  */
 
 use adw::subclass::prelude::*;
-use gtk::prelude::*;
-use gtk::{gio, glib};
+use gtk::{prelude::*, Label, ListBoxRow};
+use gtk::{gio, glib, pango};
+
+use crate::collection_jdk::CollectionJdk;
 
 mod imp {
+    use std::cell::OnceCell;
+
+    use gtk::ListBox;
+
     use super::*;
 
     #[derive(Debug, Default, gtk::CompositeTemplate)]
     #[template(resource = "/org/soneca/jdk/import/ssl/keys/window.ui")]
     pub struct JdkImportSslKeysWindow {
-        // Template widgets
-        // #[template_child]
-        // pub header_bar: TemplateChild<adw::HeaderBar>,
-        // #[template_child]
-        // pub label: TemplateChild<gtk::Label>,
+        #[template_child]
+        pub collections_list: TemplateChild<ListBox>,
+        pub collections: OnceCell<gio::ListStore>,
     }
 
     #[glib::object_subclass]
@@ -50,7 +54,15 @@ mod imp {
         }
     }
 
-    impl ObjectImpl for JdkImportSslKeysWindow {}
+    impl ObjectImpl for JdkImportSslKeysWindow {
+        fn constructed(&self) {
+            self.parent_constructed();
+            let obj = self.obj();
+
+            obj.setup_collections();
+        }
+    }
+
     impl WidgetImpl for JdkImportSslKeysWindow {}
     impl WindowImpl for JdkImportSslKeysWindow {}
     impl ApplicationWindowImpl for JdkImportSslKeysWindow {}
@@ -68,5 +80,44 @@ impl JdkImportSslKeysWindow {
         glib::Object::builder()
             .property("application", application)
             .build()
+    }
+
+    fn setup_collections(&self) {
+        let obj = CollectionJdk::new("jdk 21");
+
+        let collections = gio::ListStore::new::<CollectionJdk>();
+        collections.append(&obj);
+        // self.imp()
+        //     .collections
+        //     .set(collections.clone())
+        //     .expect("Could not set collections");
+
+        self.imp().collections_list.bind_model(
+            Some(&collections),
+            glib::clone!(@weak self as window => @default-panic, move |obj| {
+                let collection_object = obj
+                    .downcast_ref()
+                    .expect("The object should be of type `CollectionObject`.");
+                let row = window.create_collection_row(collection_object);
+                row.upcast()
+            }),
+        )
+    }
+
+    fn create_collection_row(
+        &self,
+        collection_object: &CollectionJdk,
+    ) -> ListBoxRow {
+        let label = Label::builder()
+            .ellipsize(pango::EllipsizeMode::End)
+            .xalign(0.0)
+            .build();
+
+        collection_object
+            .bind_property("title", &label, "label")
+            .sync_create()
+            .build();
+
+        ListBoxRow::builder().child(&label).build()
     }
 }

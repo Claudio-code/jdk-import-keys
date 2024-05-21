@@ -21,6 +21,9 @@
 mod application;
 mod config;
 mod window;
+mod collection_jdk;
+mod key_object;
+
 
 use self::application::JdkImportSslKeysApplication;
 use self::window::JdkImportSslKeysWindow;
