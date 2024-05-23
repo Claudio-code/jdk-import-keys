@@ -10,15 +10,10 @@ glib::wrapper! {
 }
 
 impl KeyObject {
-    pub fn new(completed: bool, content: String) -> Self {
+    pub fn new(content: String) -> Self {
         Object::builder()
-            .property("completed", completed)
             .property("content", content)
             .build()
-    }
-
-    pub fn is_completed(&self) -> bool {
-        self.imp().data.borrow().completed
     }
 
     pub fn task_data(&self) -> KeyData {
@@ -26,12 +21,11 @@ impl KeyObject {
     }
 
     pub fn from_task_data(task_data: KeyData) -> Self {
-        Self::new(task_data.completed, task_data.content)
+        Self::new(task_data.content)
     }
 }
 
 #[derive(Default, Clone, Serialize, Deserialize)]
 pub struct KeyData {
-    pub completed: bool,
     pub content: String,
 }

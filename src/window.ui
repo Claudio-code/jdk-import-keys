@@ -2,7 +2,7 @@
 <interface>
   <template class="JdkImportSslKeysWindow" parent="AdwApplicationWindow">
     <property name="title" translatable="yes">Jdks</property>
-    <property name="width-request">560</property>
+    <property name="width-request">660</property>
     <property name="height-request">500</property>
     <property name="content">
       <object class="GtkStack" id="stack">
@@ -12,7 +12,7 @@
             <property name="name">main</property>
             <property name="child">
               <object class="AdwNavigationSplitView" id="split_view">
-                <property name="min-sidebar-width">200</property>
+                <property name="min-sidebar-width">240</property>
                 <property name="sidebar">
                   <object class="AdwNavigationPage">
                     <property name="title" bind-source="JdkImportSslKeysWindow"

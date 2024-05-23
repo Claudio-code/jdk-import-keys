@@ -10,7 +10,6 @@ use super::KeyData;
 #[derive(Properties, Default)]
 #[properties(wrapper_type = super::KeyObject)]
 pub struct KeyObject {
-    #[property(name = "completed", get, set, type = bool, member = completed)]
     #[property(name = "content", get, set, type = String, member = content)]
     pub data: RefCell<KeyData>,
 }

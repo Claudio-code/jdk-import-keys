@@ -23,6 +23,7 @@ use gtk::{prelude::*, Label, ListBoxRow};
 use gtk::{gio, glib, pango};
 
 use crate::collection_jdk::CollectionJdk;
+use crate::jdk_util::{list_all_sdks};
 
 mod imp {
     use std::cell::OnceCell;
@@ -83,22 +84,24 @@ impl JdkImportSslKeysWindow {
     }
 
     fn setup_collections(&self) {
-        let obj = CollectionJdk::new("jdk 21");
-
         let collections = gio::ListStore::new::<CollectionJdk>();
-        collections.append(&obj);
+        for sdk in list_all_sdks() {
+            collections.append(&sdk);
+        }
+
         // self.imp()
         //     .collections
         //     .set(collections.clone())
         //     .expect("Could not set collections");
 
+        let window_clone = self.clone();
         self.imp().collections_list.bind_model(
             Some(&collections),
-            glib::clone!(@weak self as window => @default-panic, move |obj| {
+            glib::clone!(@weak window_clone => @default-panic, move |obj| {
                 let collection_object = obj
                     .downcast_ref()
                     .expect("The object should be of type `CollectionObject`.");
-                let row = window.create_collection_row(collection_object);
+                let row = window_clone.create_collection_row(collection_object);
                 row.upcast()
             }),
         )

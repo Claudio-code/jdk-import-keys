@@ -1,30 +1,11 @@
-/* main.rs
- *
- * Copyright 2024 soneca
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-
 mod application;
 mod config;
 mod window;
 mod collection_jdk;
 mod key_object;
+mod jdk_util;
 
-
+use std::fmt::Debug;
 use self::application::JdkImportSslKeysApplication;
 use self::window::JdkImportSslKeysWindow;
 
@@ -45,18 +26,11 @@ fn main() -> glib::ExitCode {
         .expect("Could not load resources");
     gio::resources_register(&resources);
 
+    // Load icons resources
     let icons_resources = gio::Resource::load(PKGDATADIR.to_owned() + "/icons.gresource")
         .expect("Could not load icons resources");
     gio::resources_register(&icons_resources);
 
-    // Create a new GtkApplication. The application manages our main loop,
-    // application windows, integration with the window manager/compositor, and
-    // desktop features such as file opening and single-instance applications.
     let app = JdkImportSslKeysApplication::new("org.soneca.jdk.import.ssl.keys", &gio::ApplicationFlags::empty());
-
-    // Run the application. This function will block until the application
-    // exits. Upon return, we have our exit code to return to the shell. (This
-    // is the code you see when you do `echo $?` after running a command in a
-    // terminal.
     app.run()
 }

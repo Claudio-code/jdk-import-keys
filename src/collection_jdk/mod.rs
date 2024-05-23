@@ -21,6 +21,13 @@ impl CollectionJdk {
             .build()
     }
 
+    pub fn new_with_key(title: &str, keys: gio::ListStore) -> Self {
+        Object::builder()
+            .property("title", title)
+            .property("keys", keys)
+            .build()
+    }
+
     pub fn to_collection_data(&self) -> CollectionData {
         let title = self.imp().title.borrow().clone();
         let tasks_data = self.tasks()
