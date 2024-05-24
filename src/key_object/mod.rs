@@ -1,27 +1,24 @@
 mod imp;
 
+use std::borrow::Borrow;
+
 use adw::subclass::prelude::*;
 use glib::Object;
 use gtk::glib;
 use serde::{Deserialize, Serialize};
 
 glib::wrapper! {
-    pub struct KeyObject(ObjectSubclass<imp::KeyObject>);
+    pub struct KeyObject(ObjectSubclass<imp::KeyObject>)
+        @extends gtk::Widget, adw::ActionRow, gtk::ListBoxRow,
+        @implements gtk::Accessible, gtk::Buildable, gtk::ConstraintTarget;
 }
 
 impl KeyObject {
-    pub fn new(content: String) -> Self {
+    pub fn new(key_data: KeyData) -> Self {
         Object::builder()
-            .property("content", content)
+            .property("title", key_data.content.clone())
+            .property("data", key_data)
             .build()
-    }
-
-    pub fn task_data(&self) -> KeyData {
-        self.imp().data.borrow().clone()
-    }
-
-    pub fn from_task_data(task_data: KeyData) -> Self {
-        Self::new(task_data.content)
     }
 }
 

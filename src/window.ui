@@ -6,7 +6,7 @@
     <property name="height-request">500</property>
     <property name="content">
       <object class="GtkStack" id="stack">
-        <!-- <property name="transition-type">crossfade</property> -->
+        <property name="transition-type">crossfade</property>
         <child>
           <object class="GtkStackPage">
             <property name="name">main</property>
@@ -76,7 +76,7 @@
                                       </object>
                                     </child>
                                     <child>
-                                      <object class="GtkListBox" id="tasks_list">
+                                      <object class="GtkListBox" id="keys_list">
                                         <property name="visible">False</property>
                                         <property name="selection-mode">none</property>
                                         <style>

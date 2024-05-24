@@ -1,14 +1,16 @@
 use adw::subclass::prelude::*;
-use gtk::{prelude::*, Label, ListBoxRow};
 use gtk::{gio, glib, pango};
+use gtk::{prelude::*, Label, ListBoxRow};
 
-use crate::collection_jdk::CollectionJdk;
-use crate::jdk_util::{list_all_sdks};
+use crate::collection_jdk::{CollectionJdk, CollectionJdkData};
+use crate::jdk_util::list_all_sdks;
+use crate::key_object::KeyObject;
 
 mod imp {
-    use std::cell::OnceCell;
+    use std::cell::{OnceCell, RefCell};
 
-    use gtk::ListBox;
+    use adw::NavigationSplitView;
+    use gtk::{ListBox, Stack};
 
     use super::*;
 
@@ -17,7 +19,14 @@ mod imp {
     pub struct JdkImportSslKeysWindow {
         #[template_child]
         pub collections_list: TemplateChild<ListBox>,
+        #[template_child]
+        pub keys_list: TemplateChild<ListBox>,
+        #[template_child]
+        pub split_view: TemplateChild<NavigationSplitView>,
+        #[template_child]
+        pub stack: TemplateChild<Stack>,
         pub collections: OnceCell<gio::ListStore>,
+        pub current_collection: RefCell<Option<CollectionJdk>>,
     }
 
     #[glib::object_subclass]
@@ -63,26 +72,61 @@ impl JdkImportSslKeysWindow {
             .build()
     }
 
+    fn collections(&self) -> gio::ListStore {
+        self.imp()
+            .collections
+            .get()
+            .expect("`collections` should be set in `setup_collections`.")
+            .clone()
+    }
+
     fn setup_collections(&self) {
         let collections = gio::ListStore::new::<CollectionJdk>();
-        for sdk in list_all_sdks() {
+        list_all_sdks().into_iter().for_each(|sdk| {
+            collections.append(&sdk);
             self.imp().collections_list.append(&sdk);
-        }
+        });
+        self.imp()
+            .collections
+            .set(collections.clone())
+            .expect("Could not set collections");
     }
 
     fn setup_callbacks(&self) {
+        self.set_stack();
+        self.collections().connect_items_changed(
+            glib::clone!(@weak self as window => move |_, _, _, _| window.set_stack()),
+        );
+
         self.imp().collections_list.connect_row_selected(
             glib::clone!(@weak self as window => move |_, row| {
-                // let index = row.index();
-                // let selected_collection = window.collections()
-                //     .item(index as u32)
-                //     .expect("There needs to be an object at this position.")
-                //     .downcast::<CollectionObject>()
-                //     .expect("The object needs to be a `CollectionObject`.");
-                // window.set_current_collection(selected_collection);
-                // window.imp().split_view.set_show_content(true);
-                println!("teste");
+                let index = row.unwrap().index();
+                let selected_collection = window.collections()
+                    .item(index as u32)
+                    .expect("There needs to be an object at this position.")
+                    .downcast::<CollectionJdk>()
+                    .expect("The object needs to be a `CollectionJdk`.");
+                window.set_current_collection(selected_collection);
+                window.imp().split_view.set_show_content(true);
             }),
         );
+    }
+
+    fn set_current_collection(&self, collection: CollectionJdk) {
+        self.imp().keys_list.remove_all();
+        collection
+            .data()
+            .keys
+            .into_iter()
+            .for_each(|key_data| self.imp().keys_list.append(&KeyObject::new(key_data)));
+        self.imp().keys_list.set_visible(true);
+    }
+
+    fn set_stack(&self) {
+        if self.collections().n_items() > 0 {
+            self.imp().stack.set_visible_child_name("main");
+            return;
+        }
+        self.imp().stack.set_visible_child_name("placeholder");
     }
 }

@@ -7,7 +7,7 @@ use gtk::{glib, CheckButton, CompositeTemplate, TemplateChild};
 use super::CollectionJdkData;
 
 #[derive(glib::Properties, Default, CompositeTemplate)]
-#[template(resource = "/org/soneca/jdk/import/ssl/keys/collection_jdk_row.ui")]
+#[template(resource = "/org/soneca/jdk/import/ssl/keys/collection_jdk/collection_jdk_row.ui")]
 #[properties(wrapper_type = super::CollectionJdk)]
 pub struct CollectionJdk {
     #[property(get, set, construct_only)]
