@@ -25,7 +25,9 @@ impl KeyObject {
     }
 }
 
-#[derive(Default, Clone, Serialize, Deserialize)]
+#[derive(Default, Clone, Debug, PartialEq, glib::Boxed)]
+#[boxed_type(name = "KeyData")]
 pub struct KeyData {
     pub content: String,
+    pub jdk_path: String,
 }

@@ -7,8 +7,9 @@ use std::str::FromStr;
 use std::{fs, path::PathBuf, process::Command};
 use strum_macros::EnumString;
 use adw::subclass::prelude::*;
-use gtk::prelude::*;
-use crate::collection_jdk::CollectionJdk;
+use gtk::glib;
+use crate::collection_jdk::{CollectionJdk, CollectionJdkData};
+use crate::key_object::KeyData;
 
 const ASDF_JAVA_PATH: &str = "/.asdf/installs/java";
 const JETBRAINS_JAVA_PATH: &str = "/.jdks";
@@ -87,11 +88,19 @@ fn list_jdks(paths: ReadDir, package_manager: &str) -> Vec<CollectionJdk> {
 
         if !path_name.contains("current") && is_dir {
             let jdk_name = path_name.split("/").last().unwrap();
-            // let keys: Vec<Key> = list_certs_jdk(path_name.clone())
-            //     .iter()
-            //     .map(|key_name| Key::from_string(key_name.to_string()))
-            //     .collect();
-            let jdk_collection = CollectionJdk::new(format!("{}-{}", package_manager, jdk_name).as_str());
+            let jdk_path = path_name.clone();
+            let keys: Vec<KeyData> = list_certs_jdk(path_name.clone())
+                .into_iter()
+                .map(|key| KeyData { jdk_path: jdk_path.clone(), content: key })
+                .collect();
+            let title = format!("Java-{}", jdk_name);
+            let collection_jdk_data = CollectionJdkData { 
+                title: format!("Java-{}", jdk_name),
+                package_manager: package_manager.to_string(),
+                path: path_name,
+                keys: keys.clone()
+            };
+            let jdk_collection = CollectionJdk::new(collection_jdk_data);
             jdk_collections.push(jdk_collection);
         }
     }

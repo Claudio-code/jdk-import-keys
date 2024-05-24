@@ -5,7 +5,6 @@ mod collection_jdk;
 mod key_object;
 mod jdk_util;
 
-use std::fmt::Debug;
 use self::application::JdkImportSslKeysApplication;
 use self::window::JdkImportSslKeysWindow;
 

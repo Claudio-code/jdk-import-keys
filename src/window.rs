@@ -1,23 +1,3 @@
-/* window.rs
- *
- * Copyright 2024 soneca
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-
 use adw::subclass::prelude::*;
 use gtk::{prelude::*, Label, ListBoxRow};
 use gtk::{gio, glib, pango};
@@ -59,8 +39,8 @@ mod imp {
         fn constructed(&self) {
             self.parent_constructed();
             let obj = self.obj();
-
             obj.setup_collections();
+            obj.setup_callbacks();
         }
     }
 
@@ -86,41 +66,23 @@ impl JdkImportSslKeysWindow {
     fn setup_collections(&self) {
         let collections = gio::ListStore::new::<CollectionJdk>();
         for sdk in list_all_sdks() {
-            collections.append(&sdk);
+            self.imp().collections_list.append(&sdk);
         }
-
-        // self.imp()
-        //     .collections
-        //     .set(collections.clone())
-        //     .expect("Could not set collections");
-
-        let window_clone = self.clone();
-        self.imp().collections_list.bind_model(
-            Some(&collections),
-            glib::clone!(@weak window_clone => @default-panic, move |obj| {
-                let collection_object = obj
-                    .downcast_ref()
-                    .expect("The object should be of type `CollectionObject`.");
-                let row = window_clone.create_collection_row(collection_object);
-                row.upcast()
-            }),
-        )
     }
 
-    fn create_collection_row(
-        &self,
-        collection_object: &CollectionJdk,
-    ) -> ListBoxRow {
-        let label = Label::builder()
-            .ellipsize(pango::EllipsizeMode::End)
-            .xalign(0.0)
-            .build();
-
-        collection_object
-            .bind_property("title", &label, "label")
-            .sync_create()
-            .build();
-
-        ListBoxRow::builder().child(&label).build()
+    fn setup_callbacks(&self) {
+        self.imp().collections_list.connect_row_selected(
+            glib::clone!(@weak self as window => move |_, row| {
+                // let index = row.index();
+                // let selected_collection = window.collections()
+                //     .item(index as u32)
+                //     .expect("There needs to be an object at this position.")
+                //     .downcast::<CollectionObject>()
+                //     .expect("The object needs to be a `CollectionObject`.");
+                // window.set_current_collection(selected_collection);
+                // window.imp().split_view.set_show_content(true);
+                println!("teste");
+            }),
+        );
     }
 }
