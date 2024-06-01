@@ -48,7 +48,7 @@ impl CollectionJdk {
     // }
 }
 
-#[derive(Debug, Clone, PartialEq, glib::Boxed)]
+#[derive(Default, Debug, Clone, PartialEq, glib::Boxed)]
 #[boxed_type(name = "CollectionJdkData")]
 pub struct CollectionJdkData {
     pub title: String,

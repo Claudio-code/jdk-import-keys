@@ -17,8 +17,8 @@ const SDKMAN_JAVA_PATH: &str = "/.sdkman/candidates/java";
 const KEYTOOL_PATH: &str =
     "{}/bin/keytool -list -v -keystore {}/lib/security/cacerts -storepass changeit | grep Alias";
 
-#[derive(Debug)]
-struct Dir {
+#[derive(Debug, Clone)]
+pub struct Dir {
     path_name: String,
     is_dir: bool,
 }
@@ -100,10 +100,7 @@ fn list_jdks(paths: ReadDir, package_manager: &str) -> Vec<CollectionJdk> {
         .map(move |dir| {
             let keys: Vec<KeyData> = list_certs_jdk(dir.path_name())
                 .into_iter()
-                .map(|key| KeyData {
-                    jdk_path: dir.path_name(),
-                    content: key,
-                })
+                .map(|key| KeyData::new(key, dir.clone()))
                 .collect();
             let collection_jdk_data = CollectionJdkData {
                 title: format!("Java-{}", dir.jdk_name()),
